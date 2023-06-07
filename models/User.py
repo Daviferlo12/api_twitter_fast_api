@@ -3,12 +3,12 @@ from datetime import date
 from typing import Optional
 
 #MODEL
-import UserBase
+from models.UserBase import UserBase
 
 #PYDANTIC
 from pydantic import BaseModel
 from pydantic import(
-    EmailStr, Field
+    Field
 )
 
 class User(UserBase):

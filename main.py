@@ -10,9 +10,8 @@ from pydantic import(
 # FAST API
 from fastapi import FastAPI
 #MODELS
-from models import(
-    User,Tweet,UserLogin, UserBase
-)
+from models import User, UserLogin, UserBase
+from models import Tweet
 app = FastAPI()
 
 @app.get(path="/")

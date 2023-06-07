@@ -1,5 +1,5 @@
 #MODEL
-import UserBase
+from models.UserBase import UserBase
 
 #PYDANTIC
 from pydantic import BaseModel

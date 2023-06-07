@@ -3,11 +3,11 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 #MODEL
-import User
+from models.User import User
 #PYDANTIC
 from pydantic import BaseModel
 from pydantic import(
-    EmailStr, Field
+    Field
 )
 
 class Tweet(BaseModel):
