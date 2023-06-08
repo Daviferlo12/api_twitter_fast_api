@@ -41,15 +41,15 @@ def  signup(user : UserRegister = Body(...)):
     This endpoint register a user un the app
     
     Parameter:
-        - Request boby parameter
-            - User : UserRegister
+    - Request boby parameter
+        - User : UserRegister
 
     Returns a json with the basic information of the user:
-        - user_id: UUID
-        - email: Emailstr
-        - first_name : str
-        - last_name : str
-        - birth_date: dateTime
+    - user_id: UUID
+    - email: Emailstr
+    - first_name : str
+    - last_name : str
+    - birth_date: dateTime
     """
     with open(file="users.json", mode="r+", encoding="utf-8") as file:
         results = json.loads(file.read())
@@ -172,8 +172,39 @@ def show_tweet():
     summary="Create a tweet",
     tags=["Tweets"]
 )
-def post():
-    pass
+def post(tweet : Tweet = Body(...)):
+    """
+    Create a tweet
+    
+    In this endpoint you can create a new tweet
+    
+    Parameters:
+    - Reques body parameter:
+        - tweet : Tweet
+        
+    Return a json with the basic informationb of the tweet:
+    - tweet_id : UUID
+    - content : str
+    - created_at : dateTime
+    - updated_at : Optional[dateTime]
+    - by : User
+    """
+    with open("tweets.json", mode="r+", encoding="utf-8") as file:
+        resutls = json.loads(file.read())
+        
+        tweet_dict = tweet.dict()
+        tweet_dict['tweet_id'] = str(tweet_dict['tweet_id'])
+        tweet_dict['created_at'] = str(tweet_dict["created_at"])
+        tweet_dict['updated_at'] = str(tweet_dict["updated_at"])
+        
+        tweet_dict['by']['user_id'] = str(tweet_dict['by']['user_id'])
+        tweet_dict['by']['birth_date'] = str(tweet_dict['by']['birth_date'])
+        
+        resutls.append(tweet_dict)
+        file.seek(0)
+        file.write(json.dumps(resutls))
+        
+        return tweet
 
 
 ### Update a tweet
