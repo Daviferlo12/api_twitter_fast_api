@@ -17,6 +17,7 @@ from models.User import User
 from models.UserLogin import UserLogin
 from models.UserBase import UserBase
 from models.Tweet import Tweet
+from models.UserRegister import UserRegister
 
 app = FastAPI()
 
@@ -31,6 +32,22 @@ app = FastAPI()
     tags=["Users"]
 )
 def  signup():
+    """
+    SignUp a user
+    
+    This endpoint register a user un the app
+    
+    Parameter:
+        - Request boby parameter
+            - User : UserRegister
+
+    Returns a json with the basic information of the user:
+        - user_id: UUID
+        - email: Emailstr
+        - first_name : str
+        - last_name : str
+        - birth_date: str
+    """
     pass
 
 ### Login a user
