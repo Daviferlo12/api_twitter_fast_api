@@ -14,6 +14,7 @@ from fastapi import FastAPI
 from fastapi import(
     status, Body
 )
+
 #MODELS
 from models.User import User
 from models.UserLogin import UserLogin
@@ -81,8 +82,26 @@ def login():
     summary="Show all users",
     tags=["Users"]
 )
-def  show_all_users():
-    pass
+def show_all_users():
+    """
+    **Show all Users**
+
+    This endpoint shows all users in the app.
+
+    Parameters:
+        -
+
+    Returns a JSON list with all users in the app, with the following structure:
+    - user_id: UUID
+    - email: Emailstr
+    - first_name: str
+    - last_name: str
+    - birth_date: dateTime
+    """
+    
+    with open("users.json", mode="r", encoding="utf-8") as file:
+        results = json.loads(file.read())
+        return results
 
 ### Show an especific user
 @app.get(
