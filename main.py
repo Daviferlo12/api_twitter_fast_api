@@ -149,7 +149,25 @@ def update_a_user():
     tags=["Tweets"]
     )
 def home():
-    return {"Twitter API": "Working.."}
+    """
+    **Show all tweets**
+
+    This endpoint shows all tweets published in the app.
+
+    Parameters:
+        -
+
+    Returns a JSON list with all users in the app, with the following structure:
+    - tweet_id: UUID
+    - content: str
+    - created_at : datetime
+    - updated_at : Optional[datetime]
+    - by: User
+    """
+    
+    with open("tweets.json", mode="r", encoding="utf-8") as file:
+        results = json.loads(file.read())
+        return results
 
 
 ### Get a tweet
