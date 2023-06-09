@@ -363,8 +363,64 @@ def post(tweet : Tweet = Body(...)):
     summary= "Update a tweet",
     tags=["Tweets"]
 )
-def update_a_tweet():
-    pass
+def update_a_tweet(tweet_id : UUID = Path(
+                                    ...,
+                                    title="Tweet ID",
+                                    example="7fa85f64-5717-4562-b3fc-2c963f66afn0"
+                                ),
+                   tweet : Tweet = Body(
+                       ...,
+                       title="Tweet"
+                   )):
+    """
+    **Update a Tweet**
+    
+    This is an endpoint to update an especific tweet
+    
+    Path Parameter:
+    - tweet_id : UUID
+    
+    Body parameter:
+    - tweet : tweet
+
+    Return a json with the basic informationb of the tweet:
+    - tweet_id : UUID
+    - content : str
+    - created_at : dateTime
+    - updated_at : Optional[dateTime]
+    - by : User
+        
+    """
+    with open('tweets.json', mode="r+", encoding="utf-8") as file:
+        
+        results = json.loads(file.read())
+        
+        tweet_dict = tweet.dict()
+        tweet_dict['tweet_id'] = str(tweet.tweet_id)
+        tweet_dict['content'] = tweet.content
+        tweet_dict['created_at'] = str(tweet.created_at)
+        tweet_dict['updated_at'] = str(tweet.updated_at)
+        tweet_dict['by']['user_id'] = str(tweet.by.user_id)
+        tweet_dict['by']['email'] = tweet.by.email
+        tweet_dict['by']['first_name'] = tweet.by.first_name
+        tweet_dict['by']['last_name'] = tweet.by.last_name
+        tweet_dict['by']['birth_date'] = str(tweet.by.birth_date)
+
+        for tweet in results:
+            if tweet['tweet_id'] == str(tweet_id):
+                
+                results[results.index(tweet)] = tweet_dict
+                
+                # break
+                with open('tweets.json', mode="w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(results))
+                    return tweet
+            
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sorry, tweet no found.."
+        )
 
 
 ### Delete a tweet
