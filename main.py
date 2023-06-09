@@ -189,13 +189,14 @@ def delete_a_user(user_id : UUID = Path(...)):
 )
 def update_a_user(user_id : UUID = Path(...), user : User = Body(...)):
     """
-    Update a User
+    **Update a User**
     
     This is an endpoint to update an especific user
     
-    Parameters:
+    Path Parameter:
     - user_id : UUID
-    Body parameter
+    
+    Body parameter:
     - user : User
 
     Returns a json with the information of the updated user:
@@ -275,8 +276,40 @@ def home():
     summary="Get a tweet",
     tags=["Tweets"]
 )
-def show_tweet():
-    pass
+def show_tweet(tweet_id : UUID = Path(
+                                    ...,
+                                    title="Tweet ID",
+                                    example="7fa85f64-5717-4562-b3fc-2c963f66afn0"
+                                )):
+    
+    """
+    Get a Tweet
+    
+    This is an endpoint to get an especific tweet
+    
+    Parameters:
+    - tweet_id : UUID
+
+    Returns a json with the basic tweet information:
+    - tweet_id : UUID
+    - content : str
+    - created_at : datetime 
+    - updated_at : Optional[datetime]
+    - by: User
+        
+    """
+    with open("tweets.json", mode="r", encoding="utf-8") as file:
+        result = json.loads(file.read())
+        
+        for tweet in result:
+            if tweet['tweet_id'] == str(tweet_id):             
+                return tweet
+                
+                
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail= "This tweet does not exist..."
+        )
 
 
 ### Create a tweet
