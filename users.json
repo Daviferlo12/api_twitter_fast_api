@@ -1,14 +1,14 @@
 [
     {
         "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "email": "davifer\u00f1p@example.com",
+        "email": "daviferp@example.com",
         "first_name": "david",
         "last_name": "lopez",
         "birth_date": "2023-06-08",
         "password": "asdasdasd123121"
     },
     {
-        "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
         "email": "loolpaiu@example.com",
         "first_name": "maria",
         "last_name": "aaaa",

@@ -12,7 +12,7 @@ from pydantic import(
 # FAST API
 from fastapi import FastAPI
 from fastapi import(
-    status, Body
+    status, Body, Path, HTTPException
 )
 
 #MODELS
@@ -111,8 +111,35 @@ def show_all_users():
     summary="Show a user",
     tags=["Users"]
 )
-def  show_a_user():
-    pass
+def  show_a_user(user_id : UUID = Path(...)):
+    """
+    Get a User
+    
+    This is an endpoint to get an especific user
+    
+    Parameters:
+    - user_id : UUID
+
+    Returns a json with the information of the user:
+    - user_id: UUID
+    - email: Emailstr
+    - first_name: str
+    - last_name: str
+    - birth_date: dateTime
+        
+    """
+    with open("users.json", mode="r", encoding="utf-8") as file:
+        result = json.loads(file.read())
+        
+        for user in result:
+            if user['user_id'] == str(user_id):             
+                return user
+                
+                
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail= "This user does not exist"
+        )
 
 ## Delete a user
 @app.delete(
