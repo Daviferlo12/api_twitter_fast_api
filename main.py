@@ -426,10 +426,42 @@ def update_a_tweet(tweet_id : UUID = Path(
 ### Delete a tweet
 @app.delete(
     path="/tweets/{tweet_id}/delete",
-    response_model=Tweet,
+    # response_model=Tweet,
     status_code=status.HTTP_200_OK,
     summary= "Delete a tweet",
     tags=["Tweets"]
 )
-def delete_a_tweet():
-    pass
+def delete_a_tweet(tweet_id : UUID = Path(
+                                    ...,
+                                    title="Tweet ID",
+                                    example="7fa85f64-5717-4562-b3fc-2c963f66afn0"
+                                )):
+    
+    """
+    Delete a tweet
+    
+    This is an endpoint to delete a tweet
+    
+    Parameters:
+    - tweet_id : UUID
+
+    Returns a HTTP response 200 if the tweet was correctly deleted
+        
+    """
+    with open('tweets.json', mode="r+", encoding="utf-8") as file:
+        
+        results = json.loads(file.read())
+        
+        for tweet in results:
+            if tweet['tweet_id'] == str(tweet_id):
+                results.remove(tweet)
+                # break
+                with open('tweets.json', mode="w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(results))
+                    return status.HTTP_200_OK
+            
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sorry, tweet not found.."
+        )
