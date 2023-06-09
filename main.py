@@ -187,8 +187,51 @@ def delete_a_user(user_id : UUID = Path(...)):
     summary="Update a User",
     tags=["Users"]
 )
-def update_a_user():
-    pass
+def update_a_user(user_id : UUID = Path(...), user : User = Body(...)):
+    """
+    Update a User
+    
+    This is an endpoint to update an especific user
+    
+    Parameters:
+    - user_id : UUID
+    Body parameter
+    - user : User
+
+    Returns a json with the information of the updated user:
+    - user_id: UUID
+    - email: Emailstr
+    - first_name: str
+    - last_name: str
+    - birth_date: dateTime
+        
+    """
+    with open('users.json', mode="r+", encoding="utf-8") as file:
+        
+        results = json.loads(file.read())
+        
+        user_dict = user.dict()
+        user_dict['user_id'] = str(user.user_id)
+        user_dict['email'] = user.email
+        user_dict['first_name'] = user.first_name
+        user_dict['last_name'] = user.last_name
+        user_dict['birth_date'] = str(user.birth_date)
+
+        for user in results:
+            if user['user_id'] == str(user_id):
+                
+                results[results.index(user)] = user_dict
+                
+                # break
+                with open('users.json', mode="w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(results))
+                    return user
+            
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sorry, User no found.."
+        )
 
 
 
