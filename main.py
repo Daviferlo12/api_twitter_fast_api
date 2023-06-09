@@ -144,13 +144,40 @@ def  show_a_user(user_id : UUID = Path(...)):
 ## Delete a user
 @app.delete(
     path="/users/{user_id}/delete",
-    response_model=User,
+    # response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Delete a User",
     tags=["Users"]
 )
-def delete_a_user():
-    pass
+def delete_a_user(user_id : UUID = Path(...)):
+    """
+    Delete a User
+    
+    This is an endpoint to delete a user
+    
+    Parameters:
+    - user_id : UUID
+
+    Returns a HTTP response 200 if the user was correctly deleted
+        
+    """
+    with open('users.json', mode="r+", encoding="utf-8") as file:
+        
+        results = json.loads(file.read())
+        
+        for user in results:
+            if user['user_id'] == str(user_id):
+                results.remove(user)
+                # break
+                with open('users.json', mode="w", encoding="utf-8") as f:
+                    f.seek(0)
+                    f.write(json.dumps(results))
+                    return status.HTTP_200_OK
+            
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sorry, User no found.."
+        )
 
 ### Update a user
 @app.put(
