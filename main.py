@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from fastapi import(
     status
 )
+from fastapi.staticfiles import StaticFiles
 
 #ROUTERS
 from routers import(
@@ -24,8 +25,11 @@ app = FastAPI()
 app.include_router(tweets.router)
 app.include_router(users.router)
 
+# STATIC RESOURCES
+app.mount('/static', StaticFiles(directory='static'), name="static")
 
-### Get all tweet by default
+
+### Get all tweets by default
 @app.get(
     path="/",
     response_model=List[Tweet],
