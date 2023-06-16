@@ -13,4 +13,5 @@ class UserLogin(UserBase):
         ...,
         min_length=8,
         max_length=64
-    )
+    ),
+    desible : bool = Field(...)
