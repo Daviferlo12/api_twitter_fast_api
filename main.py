@@ -20,6 +20,8 @@ from models.User import User
 
 
 app = FastAPI()
+app.title = "TWETTER API"
+app.version = "0.0.1"
 
 # INSTANCIES OF ROUTERS
 app.include_router(tweets.router)
