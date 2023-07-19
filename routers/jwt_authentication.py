@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 # PYTHON
 from pydantic import BaseModel
-from jose import JWTError, jwt
+from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
@@ -68,6 +68,12 @@ async def auth_user(token : str = Depends(oauth2)):
         username = jwt.decode(token, secret, algorithms = [ALGORITHM]).get("sub")
         if username is None:
             raise exeption
+    except ExpiredSignatureError:
+        raise HTTPException(
+                status_code= status.HTTP_401_UNAUTHORIZED,
+                detail= "Token has expired...",
+                headers={"WWW-Authenticate" : "Bearer"}
+            )
     except JWTError:
         raise exeption
     
