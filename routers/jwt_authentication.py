@@ -64,22 +64,12 @@ async def auth_user(token : str = Depends(oauth2)):
                 detail= "ERROR: invalid credentials...",
                 headers={"WWW-Authenticate" : "Bearer"}
             )
-    try:
+    try: 
         username = jwt.decode(token, secret, algorithms = [ALGORITHM]).get("sub")
-        
         if username is None:
-            raise HTTPException(
-                status_code= status.HTTP_401_UNAUTHORIZED,
-                detail= "ERROR: invalid credentials... 1",
-                headers={"WWW-Authenticate" : "Bearer"}
-            )
-        
+            raise exeption
     except JWTError:
-        raise HTTPException(
-                status_code= status.HTTP_401_UNAUTHORIZED,
-                detail= "ERROR: invalid credentials... 2",
-                headers={"WWW-Authenticate" : "Bearer"}
-            )
+        raise exeption
     
     return search_user(username)
 
@@ -114,7 +104,7 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
         
     acces_token = {
         "sub" : user.username,
-        "exp" : datetime.now() + timedelta(minutes=acces_token_duration)
+        "exp" : datetime.utcnow() + timedelta(minutes=acces_token_duration)
     }
         
     return {'access_token' : jwt.encode(acces_token, secret, algorithm = ALGORITHM), 'token_type': 'bearer'}
