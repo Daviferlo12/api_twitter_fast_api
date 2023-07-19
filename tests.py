@@ -1,16 +1,24 @@
-import json
 
 
+users_db = {
+     "daviferlo" : {
+        'username' : 'daviferlo',
+        'full_name' : 'David Lopez',
+        'email' : 'daviferlo@gmail.com',
+        'disable' : False,
+        'password' : '1234admin'
+     },
+    "daviferlo12" : {
+        'username' : 'daviferlo12',
+        'full_name' : 'David Lopez 2',
+        'email' : 'daviferlo@gmail.com',
+        'disable' : True,
+        'password' : '123445rer'
+     }
+}
 
-user_id = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
 
-with open("users.json", mode="r", encoding="utf-8") as file:
-    result = json.loads(file.read())
-    
-    for user in result:
-        if user['user_id'] == str(user_id):             
-            print(result[result.index(user)])
-            
+print(**users_db['daviferlo12'])
         
 
 

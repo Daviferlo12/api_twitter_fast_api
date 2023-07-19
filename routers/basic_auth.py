@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 app = FastAPI()
 
-oauth2 = OAuth2PasswordBearer(tokenUrl='Login')
+oauth2 = OAuth2PasswordBearer(tokenUrl='login')
 
 class User(BaseModel):
     username : str
@@ -49,14 +49,14 @@ async def current_user(token : str = Depends(oauth2)):
     if not user:
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
-            detail= "ERROR: Invalid credentials..",
+            detail= "ERROR: invalid credentials...",
             headers={'www-Authenticate' : 'Bearer'}
         )
         
     if user.disable:
         raise HTTPException(
             status_code= status.HTTP_400_BAD_REQUEST,
-            detail= "ERROR: User disabled..",
+            detail= "ERROR: user disabled..."
         )
     
     return user
@@ -68,14 +68,15 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
     if not user_db:
         raise HTTPException(
             status_code= status.HTTP_400_BAD_REQUEST,
-            detail= "ERROR: User not found.."
+            detail= "ERROR: user not found..."
         )
         
     user = search_user_db(form.username)
+    
     if not form.password == user.password:
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
-            detail= "ERROR: Invalid password.."
+            detail= "ERROR: invalid password..."
         )
     return {'access_token' : form.username, 'token_type': 'bearer'}
 
