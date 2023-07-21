@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 #ROUTERS
 from routers import(
-    tweets,users
+    tweets,users, jwt_authentication
 )
 
 #MODELS
@@ -26,6 +26,7 @@ app.version = "0.0.1"
 # INSTANCIES OF ROUTERS
 app.include_router(tweets.router)
 app.include_router(users.router)
+app.include_router(jwt_authentication.router)
 
 # STATIC RESOURCES
 app.mount('/static', StaticFiles(directory='static'), name="static")

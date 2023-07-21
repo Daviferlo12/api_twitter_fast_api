@@ -1,5 +1,5 @@
 # FAST API
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 # PYTHON
@@ -14,7 +14,7 @@ ALGORITHM = "HS256"
 acces_token_duration = 2
 secret = "0b69c4486093953c50403bd4c7c2ba3b1007c630059f6783700bd946bf1bed32"
 
-app = FastAPI()
+router = APIRouter()
 
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='login')
@@ -91,7 +91,7 @@ async def current_user(user : User = Depends(auth_user)):
     
     return user 
     
-@app.post(path='/login')
+@router.post(path='/login')
 async def login(form : OAuth2PasswordRequestForm = Depends()):
     user_db = users_db.get(form.username)
     if not user_db:
@@ -117,7 +117,7 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
 
 
 
-@app.get(path="/users/me")
+@router.get(path="/users/me")
 async def me(user : User = Depends(current_user)):
     return user
 
