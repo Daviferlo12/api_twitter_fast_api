@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 #ROUTERS
 from routers import(
-    tweets,users, jwt_authentication
+    tweets,users, jwt_authentication, basic_auth
 )
 
 #MODELS
@@ -22,10 +22,14 @@ from models.User import User
 app = FastAPI()
 app.title = "TWETTER API"
 app.version = "0.0.1"
+app.description = """API para la creacion, lectura, actualizacion y eliminacion de tweets y usuarios \n
+                    * Para poder usar consumir ciertos enpoints debes estar autenticado primero con el fin de generar un token que tiene una duracion de 20 minutos.
+                      Y para consumir estos enpoint necesitaras enviar el token con tu request"""
 
 # INSTANCIES OF ROUTERS
 app.include_router(tweets.router)
 app.include_router(users.router)
+# app.include_router(basic_auth.router)
 app.include_router(jwt_authentication.router)
 
 # STATIC RESOURCES
@@ -60,16 +64,3 @@ def home():
     with open("tweets.json", mode="r", encoding="utf-8") as file:
         results = json.loads(file.read())
         return results
-
-
-### Login a user
-@app.post(
-    path="/login",
-    response_model=User,
-    status_code=status.HTTP_200_OK,
-    summary="login a user",
-    tags=["Users"],
-    deprecated=True
-)
-def login():
-    pass

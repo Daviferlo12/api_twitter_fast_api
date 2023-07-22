@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 ALGORITHM = "HS256"
 
-acces_token_duration = 2
+acces_token_duration = 20
 secret = "0b69c4486093953c50403bd4c7c2ba3b1007c630059f6783700bd946bf1bed32"
 
 router = APIRouter()
@@ -79,7 +79,6 @@ async def auth_user(token : str = Depends(oauth2)):
     
     return search_user(username)
 
-
     
 async def current_user(user : User = Depends(auth_user)):
         
@@ -90,6 +89,7 @@ async def current_user(user : User = Depends(auth_user)):
         )
     
     return user 
+
     
 @router.post(path='/login')
 async def login(form : OAuth2PasswordRequestForm = Depends()):

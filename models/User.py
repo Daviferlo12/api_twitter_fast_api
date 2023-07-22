@@ -8,7 +8,7 @@ from models.UserBase import UserBase
 #PYDANTIC
 from pydantic import BaseModel
 from pydantic import(
-    Field
+    Field, EmailStr
 )
 
 class User(UserBase):
@@ -23,3 +23,4 @@ class User(UserBase):
         max_length=50
     )
     birth_date : Optional[date] = Field(default=None)
+    

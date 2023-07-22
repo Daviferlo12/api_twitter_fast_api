@@ -1,4 +1,5 @@
 #PYTHON
+from typing import List
 from uuid import UUID
 import json
 
@@ -7,13 +8,16 @@ from fastapi import APIRouter
 from fastapi import(
     status, Body, Path, HTTPException
 )
+from fastapi.params import Depends
 
 #MODELS
-from models.User import User
+# from models.User import User
 from models.UserLogin import UserLogin
 from models.UserBase import UserBase
 from models.Tweet import Tweet
 from models.UserRegister import UserRegister
+
+from routers.jwt_authentication import User
 
 router = APIRouter(
                     prefix="/tweets",
@@ -21,6 +25,8 @@ router = APIRouter(
                     responses={404: {'Message' : 'Error : Not Found'}}
                 )
 
+#LOGIN FUNCTIONS
+from routers.jwt_authentication import current_user
 
 
 ## TWEETS
@@ -75,7 +81,8 @@ def show_tweet(tweet_id : UUID = Path(
     status_code=status.HTTP_201_CREATED,
     summary="Create a tweet"
 )
-def post(tweet : Tweet = Body(...)):
+# def post(tweet : Annotated[Tweet, Depends(current_user)] = Body(...)):
+def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
     """
     Create a tweet
     
@@ -125,7 +132,7 @@ def update_a_tweet(tweet_id : UUID = Path(
                    tweet : Tweet = Body(
                        ...,
                        title="Tweet"
-                   )):
+                   ), user : User = Depends(current_user)):
     """
     **Update a Tweet**
     
@@ -188,7 +195,7 @@ def delete_a_tweet(tweet_id : UUID = Path(
                                     ...,
                                     title="Tweet ID",
                                     example="7fa85f64-5717-4562-b3fc-2c963f66afn0"
-                                )):
+                                ), user : User = Depends(current_user)):
     
     """
     Delete a tweet

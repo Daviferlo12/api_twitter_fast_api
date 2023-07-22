@@ -4,9 +4,8 @@ from typing import List
 import json
 
 # FAST API
-from fastapi import APIRouter
 from fastapi import(
-    status, Body, Path, HTTPException
+    status, Body, Path, HTTPException, Depends, APIRouter
 )
 
 #MODELS
@@ -20,6 +19,9 @@ router = APIRouter(
     tags=["Users"],
     responses={404: {'Message' : "Error: Not Found.."}}
 )
+
+#LOGIN FUNCTIONS
+from routers.jwt_authentication import current_user
 
 ## USERS
 
@@ -67,7 +69,7 @@ def  signup(user : UserRegister = Body(...)):
     status_code=status.HTTP_200_OK,
     summary="Show all users"
 )
-def show_all_users():
+def show_all_users(user : User = Depends(current_user)):
     """
     **Show all Users**
 
@@ -95,7 +97,7 @@ def show_all_users():
     status_code=status.HTTP_200_OK,
     summary="Show a user"
 )
-def  show_a_user(user_id : UUID = Path(...)):
+def  show_a_user(user_id : UUID = Path(...), user : User = Depends(current_user)):
     """
     Get a User
     
@@ -132,7 +134,7 @@ def  show_a_user(user_id : UUID = Path(...)):
     status_code=status.HTTP_200_OK,
     summary="Delete a User"
 )
-def delete_a_user(user_id : UUID = Path(...)):
+def delete_a_user(user_id : UUID = Path(...), user : User = Depends(current_user)):
     """
     Delete a User
     
@@ -169,7 +171,7 @@ def delete_a_user(user_id : UUID = Path(...)):
     status_code=status.HTTP_200_OK,
     summary="Update a User"
 )
-def update_a_user(user_id : UUID = Path(...), user : User = Body(...)):
+def update_a_user(user_id : UUID = Path(...), user : User = Body(...), user_auth : User = Depends(current_user)):
     """
     **Update a User**
     
