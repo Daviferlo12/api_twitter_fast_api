@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 #ROUTERS
 from routers import(
-    tweets,users, jwt_authentication, basic_auth
+    tweets,users, jwt_authentication, users_db
 )
 
 #MODELS
@@ -31,6 +31,7 @@ app.include_router(tweets.router)
 app.include_router(users.router)
 # app.include_router(basic_auth.router)
 app.include_router(jwt_authentication.router)
+app.include_router(users_db.router)
 
 # STATIC RESOURCES
 app.mount('/static', StaticFiles(directory='static'), name="static")
