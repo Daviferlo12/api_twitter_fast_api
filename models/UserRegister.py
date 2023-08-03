@@ -13,4 +13,6 @@ class UserRegister(User):
         min_length=8,
         max_length=64
     )
+    class Config:
+        exclude = {'user_id'}
     

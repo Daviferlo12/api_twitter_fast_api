@@ -6,7 +6,6 @@ from typing import Optional
 from db.models.UserBase import UserBase
 
 #PYDANTIC
-from pydantic import BaseModel
 from pydantic import(
     Field
 )

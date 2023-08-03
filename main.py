@@ -23,8 +23,8 @@ app = FastAPI()
 app.title = "TWETTER API"
 app.version = "0.0.1"
 app.description = """API para la creacion, lectura, actualizacion y eliminacion de tweets y usuarios \n
-                    * Para poder usar consumir ciertos enpoints debes estar autenticado primero con el fin de generar un token que tiene una duracion de 20 minutos.
-                      Y para consumir estos enpoint necesitaras enviar el token con tu request"""
+                    Para poder usar consumir ciertos enpoints debes estar autenticado, primero con el fin de generar un token que tiene una duracion de 20 minutos.\n
+                    Finalmente para consumir estos enpoint necesitaras enviar el token con tu request."""
 
 # INSTANCIES OF ROUTERS
 app.include_router(tweets.router)

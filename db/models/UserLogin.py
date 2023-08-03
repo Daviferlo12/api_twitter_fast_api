@@ -4,12 +4,12 @@ from db.models.UserBase import UserBase
 #PYDANTIC
 from pydantic import BaseModel
 from pydantic import(
-    Field
+    Field, SecretStr
 )
 
 
 class UserLogin(UserBase):
-    password : str = Field(
+    password : SecretStr = Field(
         ...,
         min_length=8,
         max_length=64

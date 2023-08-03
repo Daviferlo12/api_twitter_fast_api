@@ -56,17 +56,18 @@ def  signup(user : UserRegister = Body(...)):
         - User : UserRegister
 
     Returns a json with the basic information of the user:
-    - user_id: UUID
     - email: Emailstr
     - first_name : str
     - last_name : str
     - birth_date: dateTime
     """
     user_dict = dict(user)
-    del user_dict['user_id']
+    #del user_dict['user_id']
     
+    #Insert the userRegister Object
     id = db_client.local.users.insert_one(user_dict).inserted_id
     
+    # Get the inserted object using schema
     new_user = user_register_schema(db_client.local.users.find_one({"_id" : id}))
         
     return User(**new_user)   
