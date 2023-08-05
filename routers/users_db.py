@@ -2,6 +2,8 @@
 from uuid import UUID
 from typing import List
 import json
+from datetime import date
+from bson import Binary
 
 # FAST API
 from fastapi import(
@@ -62,7 +64,7 @@ def  signup(user : UserRegister = Body(...)):
     - birth_date: dateTime
     """
     user_dict = dict(user)
-    #del user_dict['user_id']
+    user_dict["user_id"] = Binary.from_uuid(user_dict["user_id"])
     
     #Insert the userRegister Object
     id = db_client.local.users.insert_one(user_dict).inserted_id
@@ -96,10 +98,8 @@ def show_all_users(user : User = Depends(current_user)):
     - last_name: str
     - birth_date: dateTime
     """
-    
-    with open("users.json", mode="r", encoding="utf-8") as file:
-        results = json.loads(file.read())
-        return results
+    return [us for us in db_client.local.users.find()]
+
 
 ### Show an especific user
 @router.get(

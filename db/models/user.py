@@ -11,6 +11,7 @@ from pydantic import(
 )
 
 class User(UserBase):
+    username : str = Field(...)
     first_name : str = Field(
         ...,
         min_length=1,
@@ -21,5 +22,5 @@ class User(UserBase):
         min_length=1,
         max_length=50
     )
-    birth_date : Optional[date] = Field(default=None)
+    birth_date : Optional[str] = Field(default= date.today())
     
