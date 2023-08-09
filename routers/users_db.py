@@ -5,6 +5,7 @@ import json
 from datetime import date
 from bson import Binary
 
+
 # FAST API
 from fastapi import(
     status, Body, Path, HTTPException, Depends, APIRouter
@@ -58,13 +59,15 @@ def  signup(user : UserRegister = Body(...)):
         - User : UserRegister
 
     Returns a json with the basic information of the user:
+    - user_id: UUID
     - email: Emailstr
     - first_name : str
     - last_name : str
     - birth_date: dateTime
     """
     user_dict = dict(user)
-    user_dict["user_id"] = Binary.from_uuid(user_dict["user_id"])
+    user_dict["_id"] = user_dict['user_id']
+    del user_dict["user_id"]
     
     #Insert the userRegister Object
     id = db_client.local.users.insert_one(user_dict).inserted_id
@@ -98,13 +101,15 @@ def show_all_users(user : User = Depends(current_user)):
     - last_name: str
     - birth_date: dateTime
     """
-    return [us for us in db_client.local.users.find()]
+    # get_user = user_register_schema(db_client.local.users.find_one({"_id" : user_id}))
+    
+    return [user_register_schema(us) for us in db_client.local.users.find()]
 
 
 ### Show an especific user
 @router.get(
     path="/{user_id}",
-    response_model=User,
+    # response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Show a user"
 )
@@ -125,18 +130,11 @@ def  show_a_user(user_id : UUID = Path(...), user : User = Depends(current_user)
     - birth_date: dateTime
         
     """
-    with open("users.json", mode="r", encoding="utf-8") as file:
-        result = json.loads(file.read())
+    # Get the user object using schema
+    get_user = user_register_schema(db_client.local.users.find_one({"_id" : user_id}))
         
-        for user in result:
-            if user['user_id'] == str(user_id):             
-                return user
-                
-                
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail= "This user does not exist"
-        )
+    return User(**get_user)   
+    
 
 ## Delete a user
 @router.delete(
