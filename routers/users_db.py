@@ -101,15 +101,14 @@ def show_all_users(user : User = Depends(current_user)):
     - last_name: str
     - birth_date: dateTime
     """
-    # get_user = user_register_schema(db_client.local.users.find_one({"_id" : user_id}))
-    
+
     return [user_register_schema(us) for us in db_client.local.users.find()]
 
 
 ### Show an especific user
 @router.get(
     path="/{user_id}",
-    # response_model=User,
+    response_model=User,
     status_code=status.HTTP_200_OK,
     summary="Show a user"
 )

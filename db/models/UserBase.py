@@ -8,6 +8,6 @@ from pydantic import(
 )
 
 class UserBase(BaseModel):
-    user_id : UUID = Field(...)
+    user_id : Optional[UUID] = Field()
     email : EmailStr = Field(...)
     desable : bool = Field(default=False)
