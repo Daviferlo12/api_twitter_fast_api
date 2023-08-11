@@ -47,7 +47,7 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
     summary="Register a User"
 )
-def  signup(user : UserRegister = Body(...)):
+def signup(user : UserRegister = Body(...)):
     
     """
     SignUp a user
@@ -65,6 +65,12 @@ def  signup(user : UserRegister = Body(...)):
     - last_name : str
     - birth_date: dateTime
     """
+    if type(search_user_by_email(user.email)) == User:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = 'User already exists'
+        )
+    
     user_dict = dict(user)
     user_dict["_id"] = user_dict['user_id']
     del user_dict["user_id"]
@@ -226,3 +232,12 @@ def update_a_user(user_id : UUID = Path(...), user : User = Body(...), user_auth
             detail="Sorry, User no found.."
         )
 
+
+# VALIDATE IF THE EMAIL ALREADY EXISTS ON THE DATA BASE
+
+def search_user_by_email(email : str): 
+    try:
+        user = user_register_schema(db_client.local.users.find_one({'email' : email}))
+        return User(**user)
+    except:
+        return {'error' : 'User not found'}

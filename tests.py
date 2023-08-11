@@ -11,7 +11,6 @@ for i in lista:
 
 
 
-
 """lista = ["Azul", "Amarillo", "Rojo", "Verde", "Cafe"]
 lista_r = lista[::-1]
 print(lista_r)"""
