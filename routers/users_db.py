@@ -196,9 +196,9 @@ def update_a_user(user : User = Body(...), user_auth : User = Depends(current_us
     user_dict["_id"] = user_dict['user_id']
     del user_dict["user_id"]
     
-    result = db_client.local.users.find_one_and_replace({'_id' : user.user_id}, user_dict)
-    
-    if not result:        
+    try:
+        db_client.local.users.find_one_and_replace({'_id' : user.user_id}, user_dict)
+    except:        
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User did not update correctly..."
