@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 #MODEL
-from models.User import User
+from db.models.user import User
 #PYDANTIC
 from pydantic import BaseModel
 from pydantic import(
@@ -11,12 +11,12 @@ from pydantic import(
 )
 
 class Tweet(BaseModel):
-    tweet_id : UUID = Field(...)
+    tweet_id : Optional[UUID] = Field()
     content : str = Field(
         ...,
         min_length=1
         ,max_length=256
         )
-    created_at : datetime = Field(default=datetime.now())
+    created_at : str = Field(default=datetime.now())
     updated_at : Optional[datetime] = Field(default=None)
     by: User = Field(...)

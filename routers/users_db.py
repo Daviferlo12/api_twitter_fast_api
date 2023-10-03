@@ -23,7 +23,7 @@ from db.models.UserRegister import UserRegister
 from routers.jwt_authentication import current_user
 
 
-#DB FUNCTIONS
+#DB
 from db.user import db_client
 
 #SCHEMAS
