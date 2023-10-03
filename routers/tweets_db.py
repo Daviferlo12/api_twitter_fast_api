@@ -61,14 +61,14 @@ def show_all_tweets():
     return tweets_schema(db_client.local.tweets.find())
 
 
-### Get a tweet
+### Get a tweet by ID
 @router.get(
     path="/{tweet_id}",
     response_model=Tweet,
     status_code=status.HTTP_200_OK,
     summary="Get a tweet"
 )
-def show_tweet(tweet_id : UUID = Path(
+def get_a_tweet_by_id(tweet_id : UUID = Path(
                                     ...,
                                     title="Tweet ID",
                                     example="7fa85f64-5717-4562-b3fc-2c963f66afn0"
@@ -87,21 +87,9 @@ def show_tweet(tweet_id : UUID = Path(
     - content : str
     - created_at : datetime 
     - updated_at : Optional[datetime]
-    - by: User
-        
+    - by: User  
     """
-    with open("tweets.json", mode="r", encoding="utf-8") as file:
-        result = json.loads(file.read())
-        
-        for tweet in result:
-            if tweet['tweet_id'] == str(tweet_id):             
-                return tweet
-                
-                
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail= "This tweet does not exist..."
-        )
+    return search_tweet('_id', tweet_id)
 
 
 ### Create a tweet
@@ -129,22 +117,13 @@ def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
     - updated_at : Optional[dateTime]
     - by : User
     """
-    with open("tweets.json", mode="r+", encoding="utf-8") as file:
-        resutls = json.loads(file.read())
+    new_dict = dict(tweet)
+    new_dict['_id'] = new_dict['tweet_id']
+    del new_dict['tweet_id']
+    
+    
         
-        tweet_dict = tweet.dict()
-        tweet_dict['tweet_id'] = str(tweet_dict['tweet_id'])
-        tweet_dict['created_at'] = str(tweet_dict["created_at"])
-        tweet_dict['updated_at'] = str(tweet_dict["updated_at"])
-        
-        tweet_dict['by']['user_id'] = str(tweet_dict['by']['user_id'])
-        tweet_dict['by']['birth_date'] = str(tweet_dict['by']['birth_date'])
-        
-        resutls.append(tweet_dict)
-        file.seek(0)
-        file.write(json.dumps(resutls))
-        
-        return tweet
+    return tweet
 
 
 ### Update a tweet
