@@ -19,12 +19,27 @@ from models.Tweet import Tweet
 from models.User import User
 
 
-app = FastAPI()
-app.title = "TWETTER API"
-app.version = "0.0.1"
-app.description = """API para la creacion, lectura, actualizacion y eliminacion de tweets y usuarios \n
-                    Para poder usar consumir ciertos enpoints debes estar autenticado, primero con el fin de generar un token que tiene una duracion de 20 minutos.\n
-                    Finalmente para consumir estos enpoint necesitaras enviar el token con tu request."""
+description = """
+        Tweeter API simulation. To use some of the endpoint you will have to be autenticated to generete an API TOKEN which will have a durarion of 20 minutes 🚀
+        
+        You will be able to:
+
+        * **Create users and tweets ** (_not implemented_yet).
+        * **Get users (depend on your role) and tweets** (_not implemented_yet).
+        * **Update users (depend on your role) and tweets** (_not implemented_yet).
+        * **Delete users (depend on your role) and tweets** (_not implemented_yet).
+                """
+
+app = FastAPI(
+    title = "TWETTER API",
+    version = "0.0.1",
+    description = description,
+    contact={
+        "name": "David Lopez",
+        "url": "https://www.linkedin.com/in/david-lopez69/",
+        "email": "daviferlo12@gmail.com",
+    }
+)
 
 # INSTANCIES OF ROUTERS
 app.include_router(tweets.router)
