@@ -24,7 +24,7 @@ from routers.jwt_authentication import current_user
 
 
 #DB
-from db.user import db_client
+from db.con import db_client
 
 #SCHEMAS
 from db.schemas.user import user_schema, users_schema

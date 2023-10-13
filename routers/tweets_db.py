@@ -16,7 +16,7 @@ from db.models.Tweet import Tweet
 from routers.jwt_authentication import User
 
 # DB
-from db.user import db_client
+from db.con import db_client
 
 # SCHEMAS
 from db.schemas.tweet import tweet_schema, tweets_schema
@@ -92,6 +92,10 @@ def get_a_tweet_by_id(tweet_id : UUID = Path(
     return search_tweet('_id', tweet_id)
 
 
+# Get a tweets by username
+
+# Get a tweets by a keyword
+
 ### Create a tweet
 @router.post(
     path="/create",
@@ -117,13 +121,17 @@ def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
     - updated_at : Optional[dateTime]
     - by : User
     """
-    new_dict = dict(tweet)
-    new_dict['_id'] = new_dict['tweet_id']
-    del new_dict['tweet_id']
+    tweet_dict = dict(tweet)
+    tweet_dict['_id'] = tweet_dict['tweet_id']
+    del tweet_dict['tweet_id']
     
+    #Insert the tweet Object and get its ID
+    id = db_client.local.tweets.insert_one(tweet_dict).inserted_id
     
+    # Get the inserted object using schema
+    new_tweet = tweet_schema(db_client.local.tweets.find_one({"_id" : id}))
         
-    return tweet
+    return new_tweet
 
 
 ### Update a tweet
@@ -244,3 +252,14 @@ def search_tweet(field : str, key):
         return Tweet(**tweet)
     except:
         return {'error' : 'User not found'}
+    
+    
+def search_tweet_by_keyword(colletion_ ,key_word): 
+    try:
+        result = db_client.local.colletion.find({"$text" : {"$search" : key_word}})
+        
+        return result
+    
+    except:
+        return {'error' : 'No coincidences'}
+    
