@@ -1,16 +1,7 @@
-import random
+from db.con import db_client
 
-lista = [random.randint(1,11) for i in range(10)]
-
-for i in lista:
-    print(f'{i} - {pow(i,2)} - {pow(i, 3)}')
-    
+result = db_client.local.tweets.find({ "by.username": { "$regex": 'strin', "$options" : 'i' } })
 
 
-
-
-
-
-"""lista = ["Azul", "Amarillo", "Rojo", "Verde", "Cafe"]
-lista_r = lista[::-1]
-print(lista_r)"""
+for i in result:
+    print(i)

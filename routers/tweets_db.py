@@ -2,6 +2,7 @@
 from typing import List
 from uuid import UUID
 import json
+import pymongo
 
 # FAST API
 from fastapi import APIRouter
@@ -92,9 +93,62 @@ def get_a_tweet_by_id(tweet_id : UUID = Path(
     return search_tweet('_id', tweet_id)
 
 
-# Get a tweets by username
+# Get a tweets by a keyword in content
 
-# Get a tweets by a keyword
+@router.get(
+    path="/search/",
+    response_model=list[Tweet],
+    status_code=status.HTTP_200_OK,
+    summary="Get tweets by keyword"
+)
+def get_tweets_by_keyword(keyword : str):
+    
+    """
+    Get tweets by a keyword
+    
+    This is an endpoint to get all tweets that matches with a keyword
+    
+    Parameters:
+    - keyword : str
+
+    Returns a json with the basic tweet information:
+    - tweet_id : UUID
+    - content : str
+    - created_at : datetime 
+    - updated_at : Optional[datetime]
+    - by: User  
+    """
+    return tweets_schema(search_tweet_by_keyword('content', keyword))
+
+
+
+# Get tweets by username
+
+@router.get(
+    path="/search/username/",
+    response_model=list[Tweet],
+    status_code=status.HTTP_200_OK,
+    summary="Get tweets by keyword"
+)
+def get_tweets_by_username(username : str):
+    
+    """
+    Get tweets by a username
+    
+    This is an endpoint to get all tweets that matches with a username
+    
+    Parameters:
+    - username : str
+
+    Returns a json with the basic tweet information:
+    - tweet_id : UUID
+    - content : str
+    - created_at : datetime 
+    - updated_at : Optional[datetime]
+    - by: User  
+    """
+    return tweets_schema(search_tweet_by_keyword('by.username',username))
+
 
 ### Create a tweet
 @router.post(
@@ -123,15 +177,16 @@ def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
     """
     tweet_dict = dict(tweet)
     tweet_dict['_id'] = tweet_dict['tweet_id']
+    tweet_dict['by'] = dict(tweet_dict['by'])
     del tweet_dict['tweet_id']
     
     #Insert the tweet Object and get its ID
     id = db_client.local.tweets.insert_one(tweet_dict).inserted_id
     
     # Get the inserted object using schema
-    new_tweet = tweet_schema(db_client.local.tweets.find_one({"_id" : id}))
+    inserted_tweet = tweet_schema(db_client.local.tweets.find_one({"_id" : id}))
         
-    return new_tweet
+    return inserted_tweet
 
 
 ### Update a tweet
@@ -254,12 +309,11 @@ def search_tweet(field : str, key):
         return {'error' : 'User not found'}
     
     
-def search_tweet_by_keyword(colletion_ ,key_word): 
+def search_tweet_by_keyword(field, key_word): 
     try:
-        result = db_client.local.colletion.find({"$text" : {"$search" : key_word}})
-        
-        return result
-    
+        #db_client.tweets.create_index([("content", pymongo.TEXT)])
+        result = db_client.local.tweets.find({ field : { "$regex": key_word, "$options" : 'i' } })
+        return result 
     except:
         return {'error' : 'No coincidences'}
     
