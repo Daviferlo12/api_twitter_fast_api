@@ -224,36 +224,19 @@ def update_a_tweet(tweet_id : UUID = Path(
     - by : User
         
     """
-    with open('tweets.json', mode="r+", encoding="utf-8") as file:
-        
-        results = json.loads(file.read())
-        
-        tweet_dict = tweet.dict()
-        tweet_dict['tweet_id'] = str(tweet.tweet_id)
-        tweet_dict['content'] = tweet.content
-        tweet_dict['created_at'] = str(tweet.created_at)
-        tweet_dict['updated_at'] = str(tweet.updated_at)
-        tweet_dict['by']['user_id'] = str(tweet.by.user_id)
-        tweet_dict['by']['email'] = tweet.by.email
-        tweet_dict['by']['first_name'] = tweet.by.first_name
-        tweet_dict['by']['last_name'] = tweet.by.last_name
-        tweet_dict['by']['birth_date'] = str(tweet.by.birth_date)
-
-        for tweet in results:
-            if tweet['tweet_id'] == str(tweet_id):
-                
-                results[results.index(tweet)] = tweet_dict
-                
-                # break
-                with open('tweets.json', mode="w", encoding="utf-8") as f:
-                    f.seek(0)
-                    f.write(json.dumps(results))
-                    return tweet
-            
+    tweet_dict = dict(tweet)
+    tweet_dict["_id"] = tweet_dict['tweet_id']
+    del tweet_dict["tweet_id"]
+    
+    try:
+        db_client.local.tweets.find_one_and_replace({'_id' : tweet.tweet_id}, tweet_dict)
+    except:        
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Sorry, tweet no found.."
+            detail="User did not update correctly..."
         )
+            
+    return search_tweet('_id', user.user_id)
 
 
 ### Delete a tweet

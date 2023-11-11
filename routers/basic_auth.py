@@ -1,9 +1,10 @@
 # FAST API
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, FastAPI
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
-router = APIRouter()
+# router = APIRouter()
+router = FastAPI()
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='login')
 
@@ -84,3 +85,6 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
 @router.get(path="/users/me")
 async def me(user : User = Depends(current_user)):
     return user
+
+
+
