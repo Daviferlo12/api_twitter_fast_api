@@ -226,6 +226,7 @@ def update_a_tweet(tweet_id : UUID = Path(
     """
     tweet_dict = dict(tweet)
     tweet_dict["_id"] = tweet_dict['tweet_id']
+    tweet_dict['by'] = dict(tweet_dict['by'])
     del tweet_dict["tweet_id"]
     
     try:
@@ -236,7 +237,7 @@ def update_a_tweet(tweet_id : UUID = Path(
             detail="User did not update correctly..."
         )
             
-    return search_tweet('_id', user.user_id)
+    return search_tweet('_id', tweet.tweet_id)
 
 
 ### Delete a tweet
@@ -262,24 +263,15 @@ def delete_a_tweet(tweet_id : UUID = Path(
 
     Returns a HTTP response 200 if the tweet was correctly deleted
         
-    """
-    with open('tweets.json', mode="r+", encoding="utf-8") as file:
-        
-        results = json.loads(file.read())
-        
-        for tweet in results:
-            if tweet['tweet_id'] == str(tweet_id):
-                results.remove(tweet)
-                # break
-                with open('tweets.json', mode="w", encoding="utf-8") as f:
-                    f.seek(0)
-                    f.write(json.dumps(results))
-                    return status.HTTP_200_OK
-            
+    """ 
+    result = db_client.local.tweets.find_one_and_delete({'_id' : tweet_id})
+    
+    if not result:     
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Sorry, tweet not found.."
+            detail="Error, tweet not eliminated"
         )
+        
         
         
 
