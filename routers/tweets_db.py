@@ -286,7 +286,6 @@ def search_tweet(field : str, key):
     
 def search_tweet_by_keyword(field, key_word): 
     try:
-        #db_client.tweets.create_index([("content", pymongo.TEXT)])
         result = db_client.local.tweets.find({ field : { "$regex": key_word, "$options" : 'i' } })
         return result 
     except:
