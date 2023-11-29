@@ -32,6 +32,7 @@ router = APIRouter(
 from routers.jwt_authentication import current_user
 
 
+
 ## TWEETS
 
 ### Get all tweets
@@ -94,7 +95,6 @@ def get_a_tweet_by_id(tweet_id : UUID = Path(
 
 
 # Get a tweets by a keyword in content
-
 @router.get(
     path="/search/",
     response_model=list[Tweet],
@@ -106,7 +106,7 @@ def get_tweets_by_keyword(keyword : str):
     """
     Get tweets by a keyword
     
-    This is an endpoint to get all tweets that matches with a keyword
+    This is an endpoint to get all tweets that matches with a keyword in the contect of the tweet
     
     Parameters:
     - keyword : str
@@ -191,17 +191,12 @@ def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
 
 ### Update a tweet
 @router.put(
-    path="/{tweet_id}/update",
+    path="/update",
     response_model=Tweet,
     status_code=status.HTTP_200_OK,
     summary= "Update a tweet"
 )
-def update_a_tweet(tweet_id : UUID = Path(
-                                    ...,
-                                    title="Tweet ID",
-                                    example="7fa85f64-5717-4562-b3fc-2c963f66afn0"
-                                ),
-                   tweet : Tweet = Body(
+def update_a_tweet(tweet : Tweet = Body(
                        ...,
                        title="Tweet"
                    ), user : User = Depends(current_user)):
@@ -271,14 +266,17 @@ def delete_a_tweet(tweet_id : UUID = Path(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Error, tweet not eliminated"
         )
+    
+    return status.HTTP_200_OK
         
         
         
 
 # Search a tweet by a parameter
+
 def search_tweet(field : str, key): 
     try:
-        tweet = tweet_schema(db_client.local.users.find_one({field : key}))
+        tweet = tweet_schema(db_client.local.tweets.find_one({field : key}))
         return Tweet(**tweet)
     except:
         return {'error' : 'User not found'}
