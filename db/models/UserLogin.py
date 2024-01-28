@@ -1,5 +1,5 @@
 #MODEL
-from db.models.UserBase import UserBase
+from db.models.UserDB import UserDB
 
 #PYDANTIC
 from pydantic import BaseModel
@@ -8,8 +8,8 @@ from pydantic import(
 )
 
 
-class UserLogin(UserBase):
-    password : SecretStr = Field(
+class UserLogin(UserDB):
+    password : str = Field(
         ...,
         min_length=8,
         max_length=64

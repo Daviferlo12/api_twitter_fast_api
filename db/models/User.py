@@ -2,16 +2,14 @@
 from datetime import date
 from typing import Optional
 
-#MODEL
-from db.models.UserBase import UserBase
-
 #PYDANTIC
 from pydantic import(
-    Field
+    Field, BaseModel, EmailStr
 )
 
-class User(UserBase):
+class User(BaseModel):
     username : str = Field(...)
+    email : EmailStr = Field(...)
     first_name : str = Field(
         ...,
         min_length=1,
@@ -23,4 +21,5 @@ class User(UserBase):
         max_length=50
     )
     birth_date : Optional[str] = Field(default= date.today())
+    desable : bool = Field(default=False)
     

@@ -1,9 +1,7 @@
 #PYTHON
-from uuid import UUID
+from uuid import UUID, uuid4
 from typing import List
-import json
-from datetime import date
-from bson import Binary
+from passlib.context import CryptContext
 
 
 # FAST API
@@ -13,9 +11,8 @@ from fastapi import(
 
 
 #MODELS
-from db.models.user import User
+from db.models.User import User
 from db.models.UserLogin import UserLogin
-from db.models.UserBase import UserBase
 from db.models.UserRegister import UserRegister
 
 
@@ -29,6 +26,8 @@ from db.con import db_client
 #SCHEMAS
 from db.schemas.user import user_schema, users_schema
 
+#passlib instance
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(
     prefix="/users_db",
@@ -72,8 +71,8 @@ def signup(user : UserRegister = Body(...)):
         )
     
     user_dict = dict(user)
-    user_dict["_id"] = user_dict['user_id']
-    del user_dict["user_id"]
+    user_dict["_id"] = uuid4()
+    user_dict['password'] = str(pwd_context.hash(user_dict["password"]))
     
     #Insert the userRegister Object
     id = db_client.local.users.insert_one(user_dict).inserted_id

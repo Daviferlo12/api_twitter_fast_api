@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 #MODEL
-from db.models.user import User
+from db.models.User import User
 #PYDANTIC
 from pydantic import BaseModel
 from pydantic import(

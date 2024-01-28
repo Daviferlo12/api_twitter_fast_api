@@ -1,11 +1,10 @@
 #MODELS
-from db.models.user import User
+from db.models.User import User
 
 #PYDANTIC
 from pydantic import(
-    Field
+    Field, SecretStr
 )
-
 
 class UserRegister(User):
     
