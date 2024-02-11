@@ -27,7 +27,7 @@ from db.con import db_client
 from db.schemas.user import user_schema, users_schema
 
 #passlib instance
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(
     prefix="/users_db",
@@ -72,7 +72,7 @@ def signup(user : UserRegister = Body(...)):
     
     user_dict = dict(user)
     user_dict["_id"] = uuid4()
-    user_dict['password'] = str(pwd_context.hash(user_dict["password"]))
+    user_dict['password'] = str(pwd_crypt.hash(user_dict["password"]))
     
     #Insert the userRegister Object
     id = db_client.local.users.insert_one(user_dict).inserted_id
@@ -208,7 +208,6 @@ def update_a_user(user : User = Body(...), user_auth : User = Depends(current_us
 
 
 # VALIDATE IF THE EMAIL ALREADY EXISTS ON THE DATA BASE
-
 def search_user(field : str, key): 
     try:
         user = user_schema(db_client.local.users.find_one({field : key}))

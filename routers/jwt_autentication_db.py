@@ -8,6 +8,16 @@ from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
+#SCHEMAS
+from db.schemas.user import user_schema
+
+#DB
+from db.con import db_client
+
+#MODELS
+from db.models import(
+    User, UserDB
+)
 
 ALGORITHM = "HS256"
 
@@ -19,41 +29,22 @@ router = APIRouter()
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='login')
 
-crypt = CryptContext(schemes=["bcrypt"])
+crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class User(BaseModel):
-    username : str
-    full_name : str
-    email : str
-    disable : bool
-    
-class User_DB(User):
-    password : str
-    
-users_db = {
-     "daviferlo" : {
-        'username' : 'daviferlo',
-        'full_name' : 'David Lopez',
-        'email' : 'daviferlo@gmail.com',
-        'disable' : False,
-        'password' : '$2a$12$OksUPjFTZLVwyUD8HaGNxO2j2iTZrGqi9a4PiopreVPdK2iQQ3Ffy'
-     },
-    "daviferlo12" : {
-        'username' : 'daviferlo12',
-        'full_name' : 'David Lopez 2',
-        'email' : 'daviferlo@gmail.com',
-        'disable' : True,
-        'password' : '$2a$12$bOnZGaUXc2yQT9q5N9zBmOlgH2dttDS/6QaKV7Ue6HmF5i9UG1GO6'
-     }
-}
 
-def search_user_db(username : str):
-    if username in users_db:
-        return User_DB(**users_db[username])
+def search_user_db(field : str, key):
+    try:
+        user = user_schema(db_client.local.users.find_one({field : key}))
+        return UserDB(**user)
+    except:
+        return {'error' : 'User not found'}
     
-def search_user(username : str):
-    if username in users_db:
-        return User(**users_db[username])
+def search_user(field : str, key): 
+    try:
+        user = user_schema(db_client.local.users.find_one({field : key}))
+        return User(**user)
+    except:
+        return {'error' : 'User not found'}
    
 
 
@@ -93,15 +84,17 @@ async def current_user(user : User = Depends(auth_user)):
     
 @router.post(path='/login')
 async def login(form : OAuth2PasswordRequestForm = Depends()):
-    user_db = users_db.get(form.username)
+    
+    #Validate is the user exists
+    user_db = search_user('username', form.username)
     if not user_db:
         raise HTTPException(
             status_code= status.HTTP_400_BAD_REQUEST,
             detail= "ERROR: User not found.."
         )
         
-    user = search_user_db(form.username)
-    
+    #Validate the user's password
+    user = search_user_db('username', form.username)
     if not crypt.verify(form.password, user.password):
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
