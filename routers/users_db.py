@@ -12,8 +12,7 @@ from fastapi import(
 
 #MODELS
 from db.models.User import User
-from db.models.UserLogin import UserLogin
-from db.models.UserRegister import UserRegister
+from db.models.UserDB import UserDB
 
 
 #LOGIN FUNCTIONS
@@ -46,7 +45,7 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
     summary="Register a User"
 )
-def signup(user : UserRegister = Body(...)):
+def signup(user : UserDB = Body(...)):
     
     """
     SignUp a user
@@ -74,10 +73,10 @@ def signup(user : UserRegister = Body(...)):
     user_dict["_id"] = uuid4()
     user_dict['password'] = str(pwd_crypt.hash(user_dict["password"]))
     
-    #Insert the userRegister Object
+    #Insert the userRegister Object and get the user's _id
     id = db_client.local.users.insert_one(user_dict).inserted_id
     
-    # Get the inserted object using schema
+    # Get the inserted object using the schema function
     new_user = user_schema(db_client.local.users.find_one({"_id" : id}))
         
     return User(**new_user)   

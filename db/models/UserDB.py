@@ -12,3 +12,8 @@ from pydantic import(
 
 class UserDB(User):
     user_id : Optional[UUID] = Field(default_factory=uuid4, title="UUID version 4")
+    password : str = Field(
+        ...,
+        min_length=8,
+        max_length=64
+    )

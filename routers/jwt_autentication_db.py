@@ -10,9 +10,11 @@ from datetime import datetime, timedelta
 
 #SCHEMAS
 from db.schemas.user import user_schema
+#from db.schemas.user import user_schema_DB
 
 #DB
 from db.con import db_client
+from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure
 
 #MODELS
 from db.models import(
@@ -34,10 +36,20 @@ crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def search_user_db(field : str, key):
     try:
-        user = user_schema(db_client.local.users.find_one({field : key}))
-        return UserDB(**user)
-    except:
-        return {'error' : 'User not found'}
+        user = db_client.local.users.find_one({field : key})
+
+        if user is not None:
+            print(UserDB(**user))
+            return UserDB(**user)
+        
+        else:
+            return {'Error' : 'User nor found'}
+        
+    except (ServerSelectionTimeoutError, ConnectionFailure) as e:
+        return {'error': f'MongoDB error: {e}'}
+    
+    except Exception as e:
+        return {'error': f'Unexpected error: {e}'}
     
 def search_user(field : str, key): 
     try:
@@ -86,16 +98,18 @@ async def current_user(user : User = Depends(auth_user)):
 async def login(form : OAuth2PasswordRequestForm = Depends()):
     
     #Validate is the user exists
-    user_db = search_user('username', form.username)
-    if not user_db:
+    user = dict(search_user('username', form.username))
+    if not user:
         raise HTTPException(
             status_code= status.HTTP_400_BAD_REQUEST,
             detail= "ERROR: User not found.."
         )
         
     #Validate the user's password
-    user = search_user_db('username', form.username)
-    if not crypt.verify(form.password, user.password):
+    print(form.username)
+    user_db = search_user_db('username', form.username)
+    print(user_db)
+    if not crypt.verify(form.password, user_db.password):
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
             detail= "ERROR: Invalid password.."

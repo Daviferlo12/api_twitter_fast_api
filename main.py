@@ -11,12 +11,17 @@ from fastapi.staticfiles import StaticFiles
 
 #ROUTERS
 from routers import(
-    tweets,users, jwt_authentication, users_db, tweets_db
+    tweets,users, jwt_authentication, users_db, tweets_db, jwt_autentication_db
 )
 
 #MODELS
-from models.Tweet import Tweet
-from models.User import User
+from db.models.Tweet import Tweet
+
+#ESCHEMAS
+from db.schemas.tweet import tweets_schema
+
+#DB
+from db.con import db_client
 
 
 description = """
@@ -46,8 +51,10 @@ app.include_router(tweets.router)
 app.include_router(users.router)
 
 # autentication_routers
+
 # app.include_router(basic_auth.router)
-app.include_router(jwt_authentication.router)
+#app.include_router(jwt_authentication.router)
+app.include_router(jwt_autentication_db.router)
 
 # users DB
 app.include_router(users_db.router)
@@ -83,7 +90,4 @@ def home():
     - updated_at : Optional[datetime]
     - by: User
     """
-    
-    with open("tweets.json", mode="r", encoding="utf-8") as file:
-        results = json.loads(file.read())
-        return results
+    return tweets_schema(db_client.local.tweets.find())
