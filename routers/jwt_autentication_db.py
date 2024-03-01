@@ -17,9 +17,8 @@ from db.con import db_client
 from pymongo.errors import ServerSelectionTimeoutError, ConnectionFailure
 
 #MODELS
-from db.models import(
-    User, UserDB
-)
+from db.models.User import User
+from db.models.UserDB import UserDB
 
 ALGORITHM = "HS256"
 
@@ -39,17 +38,15 @@ def search_user_db(field : str, key):
         user = db_client.local.users.find_one({field : key})
 
         if user is not None:
-            print(UserDB(**user))
             return UserDB(**user)
-        
         else:
-            return {'Error' : 'User nor found'}
-        
+            return {'Error' : 'User nor found'}     
     except (ServerSelectionTimeoutError, ConnectionFailure) as e:
         return {'error': f'MongoDB error: {e}'}
     
     except Exception as e:
         return {'error': f'Unexpected error: {e}'}
+    
     
 def search_user(field : str, key): 
     try:
@@ -98,7 +95,7 @@ async def current_user(user : User = Depends(auth_user)):
 async def login(form : OAuth2PasswordRequestForm = Depends()):
     
     #Validate is the user exists
-    user = dict(search_user('username', form.username))
+    user = search_user('username', form.username)
     if not user:
         raise HTTPException(
             status_code= status.HTTP_400_BAD_REQUEST,
@@ -106,9 +103,7 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
         )
         
     #Validate the user's password
-    print(form.username)
     user_db = search_user_db('username', form.username)
-    print(user_db)
     if not crypt.verify(form.password, user_db.password):
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
@@ -116,7 +111,7 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
         )
         
     acces_token = {
-        "sub" : user.username,
+        "sub" : str(user.username),
         "exp" : datetime.utcnow() + timedelta(minutes=acces_token_duration)
     }
         
