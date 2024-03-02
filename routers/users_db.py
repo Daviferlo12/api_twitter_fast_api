@@ -29,7 +29,7 @@ from db.schemas.user import user_schema, users_schema
 pwd_crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 router = APIRouter(
-    prefix="/users_db",
+    prefix="/users",
     tags=["Users"],
     responses={status.HTTP_404_NOT_FOUND: {'Message' : "Error: Not Found.."}}
 )

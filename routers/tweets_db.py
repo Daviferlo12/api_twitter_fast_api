@@ -23,7 +23,7 @@ from db.con import db_client
 from db.schemas.tweet import tweet_schema, tweets_schema
 
 router = APIRouter(
-                    #prefix="/tweets_db",
+                    prefix="/tweets",
                     tags=["Tweets"],
                     responses={404: {'Message' : 'Error : Not Found'}}
                 )

@@ -1,5 +1,4 @@
 #PYTHON
-import json
 from typing import List
 
 # FAST API
