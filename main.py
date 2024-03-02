@@ -87,4 +87,4 @@ def home():
     - updated_at : Optional[datetime]
     - by: User
     """
-    return tweets_schema(db_client.local.tweets.find())
+    return tweets_schema(db_client.tweets.find())

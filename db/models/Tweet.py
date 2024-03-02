@@ -11,7 +11,6 @@ from pydantic import(
 )
 
 class Tweet(BaseModel):
-    tweet_id : Optional[UUID] = Field()
     content : str = Field(
         ...,
         min_length=1

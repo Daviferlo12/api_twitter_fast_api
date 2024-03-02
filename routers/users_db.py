@@ -74,10 +74,10 @@ def signup(user : UserDB = Body(...)):
     user_dict['password'] = str(pwd_crypt.hash(user_dict["password"]))
     
     #Insert the userRegister Object and get the user's _id
-    id = db_client.local.users.insert_one(user_dict).inserted_id
+    id = db_client.users.insert_one(user_dict).inserted_id
     
     # Get the inserted object using the schema function
-    new_user = user_schema(db_client.local.users.find_one({"_id" : id}))
+    new_user = user_schema(db_client.users.find_one({"_id" : id}))
         
     return User(**new_user)   
 
@@ -105,7 +105,7 @@ def show_all_users(user : User = Depends(current_user)):
     - last_name: str
     - birth_date: dateTime
     """
-    return users_schema(db_client.local.users.find())
+    return users_schema(db_client.users.find())
 
 
 ### Show an especific user
@@ -156,7 +156,7 @@ def delete_a_user(user_id : UUID = Path(...), user : User = Depends(current_user
         
     """
         
-    result = db_client.local.users.find_one_and_delete({'_id' : user_id})
+    result = db_client.users.find_one_and_delete({'_id' : user_id})
     
     if not result:     
         raise HTTPException(
@@ -195,7 +195,7 @@ def update_a_user(user : User = Body(...), user_auth : User = Depends(current_us
     del user_dict["user_id"]
     
     try:
-        db_client.local.users.find_one_and_replace({'_id' : user.user_id}, user_dict)
+        db_client.users.find_one_and_replace({'_id' : user.user_id}, user_dict)
     except:        
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -209,7 +209,7 @@ def update_a_user(user : User = Body(...), user_auth : User = Depends(current_us
 # VALIDATE IF THE EMAIL ALREADY EXISTS ON THE DATA BASE
 def search_user(field : str, key): 
     try:
-        user = user_schema(db_client.local.users.find_one({field : key}))
+        user = user_schema(db_client.users.find_one({field : key}))
         return User(**user)
     except:
         return {'error' : 'User not found'}

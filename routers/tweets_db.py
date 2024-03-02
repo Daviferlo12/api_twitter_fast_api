@@ -1,8 +1,7 @@
 #PYTHON
 from typing import List
 from uuid import UUID
-import json
-import pymongo
+from uuid import UUID, uuid4
 
 # FAST API
 from fastapi import APIRouter
@@ -14,13 +13,14 @@ from fastapi.params import Depends
 #MODELS
 # from models.User import User
 from db.models.Tweet import Tweet
+from db.models.TweetDB import TweetDB
 from db.models.User import User
 
 # DB
 from db.con import db_client
 
 # SCHEMAS
-from db.schemas.tweet import tweet_schema, tweets_schema
+from db.schemas.tweet import tweet_schema, tweets_schema, tweet_schema_db
 
 router = APIRouter(
                     prefix="/tweets",
@@ -38,7 +38,7 @@ from routers.jwt_autentication_db import current_user
 ### Get all tweets
 @router.get(
     path="/",
-    response_model=List[Tweet],
+    response_model=List[TweetDB],
     status_code=status.HTTP_200_OK,
     summary="Show all tweets"
 )
@@ -60,13 +60,13 @@ def show_all_tweets():
     - updated_at: str
     - updated_at: User
     """
-    return tweets_schema(db_client.local.tweets.find())
+    return tweets_schema(db_client.tweets.find())
 
 
 ### Get a tweet by ID
 @router.get(
     path="/{tweet_id}",
-    response_model=Tweet,
+    response_model=TweetDB,
     status_code=status.HTTP_200_OK,
     summary="Get a tweet"
 )
@@ -97,7 +97,7 @@ def get_a_tweet_by_id(tweet_id : UUID = Path(
 # Get a tweets by a keyword in content
 @router.get(
     path="/search/",
-    response_model=list[Tweet],
+    response_model=list[TweetDB],
     status_code=status.HTTP_200_OK,
     summary="Get tweets by keyword"
 )
@@ -126,7 +126,7 @@ def get_tweets_by_keyword(keyword : str):
 
 @router.get(
     path="/search/username/",
-    response_model=list[Tweet],
+    response_model=list[TweetDB],
     status_code=status.HTTP_200_OK,
     summary="Get tweets by keyword"
 )
@@ -157,8 +157,7 @@ def get_tweets_by_username(username : str):
     status_code=status.HTTP_201_CREATED,
     summary="Create a tweet"
 )
-# def post(tweet : Annotated[Tweet, Depends(current_user)] = Body(...)):
-def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
+def post(tweet : TweetDB = Body(...), user : User = Depends(current_user)):
     """
     Create a tweet
     
@@ -176,15 +175,14 @@ def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
     - by : User
     """
     tweet_dict = dict(tweet)
-    tweet_dict['_id'] = tweet_dict['tweet_id']
+    tweet_dict['_id'] = uuid4()
     tweet_dict['by'] = dict(tweet_dict['by'])
-    del tweet_dict['tweet_id']
     
     #Insert the tweet Object and get its ID
-    id = db_client.local.tweets.insert_one(tweet_dict).inserted_id
+    id = db_client.tweets.insert_one(tweet_dict).inserted_id
     
     # Get the inserted object using schema
-    inserted_tweet = tweet_schema(db_client.local.tweets.find_one({"_id" : id}))
+    inserted_tweet = tweet_schema(db_client.tweets.find_one({"_id" : id}))
         
     return inserted_tweet
 
@@ -192,7 +190,7 @@ def post(tweet : Tweet = Body(...), user : User = Depends(current_user)):
 ### Update a tweet
 @router.put(
     path="/update",
-    response_model=Tweet,
+    response_model=TweetDB,
     status_code=status.HTTP_200_OK,
     summary= "Update a tweet"
 )
@@ -225,14 +223,14 @@ def update_a_tweet(tweet : Tweet = Body(
     del tweet_dict["tweet_id"]
     
     try:
-        db_client.local.tweets.find_one_and_replace({'_id' : tweet.tweet_id}, tweet_dict)
+        db_client.tweets.find_one_and_replace({'_id' : tweet.tweet_id}, tweet_dict)
     except:        
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User did not update correctly..."
         )
             
-    return search_tweet('_id', tweet.tweet_id)
+    return search_tweet_db('_id', tweet.tweet_id)
 
 
 ### Delete a tweet
@@ -259,7 +257,7 @@ def delete_a_tweet(tweet_id : UUID = Path(
     Returns a HTTP response 200 if the tweet was correctly deleted
         
     """ 
-    result = db_client.local.tweets.find_one_and_delete({'_id' : tweet_id})
+    result = db_client.tweets.find_one_and_delete({'_id' : tweet_id})
     
     if not result:     
         raise HTTPException(
@@ -276,15 +274,23 @@ def delete_a_tweet(tweet_id : UUID = Path(
 
 def search_tweet(field : str, key): 
     try:
-        tweet = tweet_schema(db_client.local.tweets.find_one({field : key}))
+        tweet = tweet_schema(db_client.tweets.find_one({field : key}))
         return Tweet(**tweet)
+    except:
+        return {'error' : 'User not found'}
+
+def search_tweet_db(field : str, key): 
+    try:
+        tweet = tweet_schema_db(db_client.tweets.find_one({field : key}))
+        return TweetDB(**tweet)
     except:
         return {'error' : 'User not found'}
     
     
+    
 def search_tweet_by_keyword(field, key_word): 
     try:
-        result = db_client.local.tweets.find({ field : { "$regex": key_word, "$options" : 'i' } })
+        result = db_client.tweets.find({ field : { "$regex": key_word, "$options" : 'i' } })
         return result 
     except:
         return {'error' : 'No coincidences'}

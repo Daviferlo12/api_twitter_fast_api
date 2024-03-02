@@ -34,7 +34,7 @@ crypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def search_user_db(field : str, key):
     try:
-        user = db_client.local.users.find_one({field : key})
+        user = db_client.users.find_one({field : key})
 
         if user is not None:
             return UserDB(**user)
@@ -49,7 +49,7 @@ def search_user_db(field : str, key):
     
 def search_user(field : str, key): 
     try:
-        user = user_schema(db_client.local.users.find_one({field : key}))
+        user = user_schema(db_client.users.find_one({field : key}))
         return User(**user)
     except:
         return {'error' : 'User not found'}
@@ -103,6 +103,9 @@ async def login(form : OAuth2PasswordRequestForm = Depends()):
         
     #Validate the user's password
     user_db = search_user_db('username', form.username)
+    
+    print(user_db)
+    
     if not crypt.verify(form.password, user_db.password):
         raise HTTPException(
             status_code= status.HTTP_401_UNAUTHORIZED,
