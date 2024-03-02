@@ -3,7 +3,6 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 # PYTHON
-from pydantic import BaseModel
 from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
@@ -77,12 +76,12 @@ async def auth_user(token : str = Depends(oauth2)):
     except JWTError:
         raise exeption
     
-    return search_user(username)
+    return search_user('username', username)
 
     
 async def current_user(user : User = Depends(auth_user)):
-        
-    if user.disable:
+    
+    if user.desable:
         raise HTTPException(
             status_code= status.HTTP_400_BAD_REQUEST,
             detail= "ERROR: user disabled..."

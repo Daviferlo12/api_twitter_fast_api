@@ -16,7 +16,7 @@ from db.models.UserDB import UserDB
 
 
 #LOGIN FUNCTIONS
-from routers.jwt_authentication import current_user
+from routers.jwt_autentication_db import current_user
 
 
 #DB

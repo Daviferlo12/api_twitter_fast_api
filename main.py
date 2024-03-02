@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 
 #ROUTERS
 from routers import(
-    tweets,users, jwt_authentication, users_db, tweets_db, jwt_autentication_db
+    users_db, tweets_db, jwt_autentication_db
 )
 
 #MODELS
@@ -47,13 +47,11 @@ app = FastAPI(
 )
 
 # INSTANCIES OF ROUTERS
-app.include_router(tweets.router)
-app.include_router(users.router)
+
 
 # autentication_routers
-
 # app.include_router(basic_auth.router)
-#app.include_router(jwt_authentication.router)
+# app.include_router(jwt_authentication.router)
 app.include_router(jwt_autentication_db.router)
 
 # users DB

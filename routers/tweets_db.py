@@ -14,7 +14,7 @@ from fastapi.params import Depends
 #MODELS
 # from models.User import User
 from db.models.Tweet import Tweet
-from routers.jwt_authentication import User
+from db.models.User import User
 
 # DB
 from db.con import db_client
@@ -23,13 +23,13 @@ from db.con import db_client
 from db.schemas.tweet import tweet_schema, tweets_schema
 
 router = APIRouter(
-                    prefix="/tweets_db",
+                    #prefix="/tweets_db",
                     tags=["Tweets"],
                     responses={404: {'Message' : 'Error : Not Found'}}
                 )
 
 #LOGIN FUNCTIONS
-from routers.jwt_authentication import current_user
+from routers.jwt_autentication_db import current_user
 
 
 
